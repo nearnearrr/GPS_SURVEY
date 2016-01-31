@@ -37,6 +37,8 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private Criteria objCriteria;
     private boolean GPSABoolean, networkABoolean;
     private ManageTABLE objManageTABLE;
+    private double[] latDoubles, lngDoubles;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,24 +78,27 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void clickFinish(View view) {
 
+        String tag = "Calculate";
+
+
         SQLiteDatabase objSqLiteDatabase = openOrCreateDatabase(MyOpenHelper.DATABASE_NAME,
                 MODE_PRIVATE, null);
         Cursor objCursor = objSqLiteDatabase.rawQuery("SELECT * FROM " + ManageTABLE.TABLE_latlngTABLE, null);
 
         objCursor.moveToFirst();
 
-        int intPoint = objCursor.getCount();
+        int intPoint = objCursor.getCount();    // จำนวนเหลี่ยม
 
         if (intPoint >= 3) {
 
             //Can Calculate Area
-            double[] latDoubles = new double[intPoint];
-            double[] lngDoubles = new double[intPoint];
+            latDoubles = new double[intPoint];
+            lngDoubles = new double[intPoint];
             LatLng[] pointLatLngs = new LatLng[intPoint];
             PolygonOptions myPolygonOptions = new PolygonOptions();
 
             //Get Value From SQLite
-            for (int i=0; i < intPoint; i++) {
+            for (int i = 0; i < intPoint; i++) {
                 latDoubles[i] = Double.parseDouble(objCursor.getString(objCursor.getColumnIndex(ManageTABLE.COLUMN_lat)));
                 lngDoubles[i] = Double.parseDouble(objCursor.getString(objCursor.getColumnIndex(ManageTABLE.COLUMN_lng)));
                 pointLatLngs[i] = new LatLng(latDoubles[i], lngDoubles[i]);
@@ -116,7 +121,34 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                     Toast.LENGTH_SHORT).show();
         }
         objCursor.close();
+
+        //Start Calculate
+        int intTriangle = intPoint - 2; // นี้คือจำนวนของสามเหลี่ยมที่สร้างในรูปหลายเหลี่ยม
+        Log.d(tag, "จำนวนเหลี่ยม = " + intPoint);
+        Log.d(tag, "สามเหลี่ยมที่สร้างได้ =" + intTriangle);
+
+        //Calculate Triangle
+        double area = triangleArea(10.0, 20.0, 30.0);
+
+
+
+
+
+
     } // clickFinish
+
+    private double triangleArea(double douDis1, double douDis2, double douDis3) {
+        return 0;
+    }
+
+    // นี้คือ เมทอด ที่หาระยะ ระหว่างจุด
+    private double distance(double douX1, double douY1, double douX2, double douY2) {
+
+        Double douDistance = Math.sqrt( Math.pow((douX1 - douX2),2) + Math.pow((douY1 - douY2), 2));
+
+        return douDistance;
+    }
+
 
     private void deleteLatLngTABLE() {
         SQLiteDatabase objSqLiteDatabase = openOrCreateDatabase(MyOpenHelper.DATABASE_NAME,
