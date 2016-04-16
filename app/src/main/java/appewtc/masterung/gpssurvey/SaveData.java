@@ -1,13 +1,16 @@
 package appewtc.masterung.gpssurvey;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.format.DateFormat;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,6 +40,45 @@ public class SaveData extends AppCompatActivity {
 
     }   // Main Method
 
+    public void clickSaveData(View view) {
+
+        nameString = nameEditText.getText().toString().trim();
+        addressString = addressEditText.getText().toString().trim();
+
+        //Check Space
+        if (nameString.equals("") || addressString.equals("") ) {
+            Toast.makeText(this, "กรุณากรอกให้ครบทุกช่อง", Toast.LENGTH_SHORT).show();
+        } else {
+
+            AddValueToSQLite();
+
+
+        }
+
+
+    }   //clickSavedata
+
+    private void AddValueToSQLite() {
+
+        ManageTABLE manageTABLE = new ManageTABLE(this);
+        manageTABLE.addPlanet(nameString, dateString, areaString);
+
+        for (int i = 0; i < latSrings.length; i++) {
+
+            manageTABLE.addSuevey(dateString, nameString,
+                    addressString, latSrings[i], lngStrings[i], areaString);
+
+        }   // for
+
+        Toast.makeText(this, "ขอบคุณครับ บันทึกข้อมูล เรียบร้อย", Toast.LENGTH_SHORT).show();
+
+        Intent intent = new Intent(SaveData.this, ShowHistory.class);
+        startActivity(intent);
+        finish();
+
+
+    } // AddValueSQLite
+
     private void creatListview() {
 
         SQLiteDatabase sqLiteDatabase = openOrCreateDatabase(MyOpenHelper.DATABASE_NAME,
@@ -45,13 +87,13 @@ public class SaveData extends AppCompatActivity {
         cursor.moveToFirst();
         int intcount = cursor.getCount();
         String[] pointStrings = new String[intcount];
-        String[] latStrings = new String[intcount];
-        String[] lngStrings = new String[intcount];
+         latSrings = new String[intcount];
+         lngStrings = new String[intcount];
 
         for (int i = 0; i < intcount; i++) {
 
             pointStrings[i] = cursor.getString(cursor.getColumnIndex(ManageTABLE.COLUMN_ID));
-            latStrings[i] = cursor.getString(cursor.getColumnIndex(ManageTABLE.COLUMN_lat));
+            latSrings[i] = cursor.getString(cursor.getColumnIndex(ManageTABLE.COLUMN_lat));
             lngStrings[i] = cursor.getString(cursor.getColumnIndex(ManageTABLE.COLUMN_lng));
 
             cursor.moveToNext();
@@ -61,7 +103,7 @@ public class SaveData extends AppCompatActivity {
         }   //for
         cursor.close();
 
-        SaveAdapter saveAdapter = new SaveAdapter(this, pointStrings, latStrings, lngStrings);
+        SaveAdapter saveAdapter = new SaveAdapter(this, pointStrings, latSrings, lngStrings);
         listView.setAdapter(saveAdapter);
 
 
