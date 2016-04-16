@@ -38,6 +38,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
     private boolean GPSABoolean, networkABoolean;
     private ManageTABLE objManageTABLE;
     private double[] latDoubles, lngDoubles;
+    private String strArea;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +66,33 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         mapFragment.getMapAsync(this);
 
     }   // Main Method
+
+    public void clickSavemain(View view) {
+
+        SQLiteDatabase sqLiteDatabase = openOrCreateDatabase(MyOpenHelper.DATABASE_NAME,
+                MODE_PRIVATE, null);
+        Cursor cursor = sqLiteDatabase.rawQuery("SELECT * FROM " + ManageTABLE.survey_table , null);
+        cursor.moveToFirst();
+        String[] latString = new String[cursor.getCount()];
+        String[] lngString = new String[cursor.getCount()];
+
+        for (int i = 0; i < cursor.getCount(); i++) {
+
+            latString[i] = cursor.getString(cursor.getColumnIndex(ManageTABLE.columm_Lat));
+            lngString[i] = cursor.getString(cursor.getColumnIndex(ManageTABLE.columm_Lng));
+
+            cursor.moveToNext();
+
+        }   // for
+        cursor.close();
+
+        Intent intent = new Intent(MainActivity.this, SaveData.class);
+        intent.putExtra("Area", strArea);
+        intent.putExtra("Lat", latString);
+        intent.putExtra("lng", lngString);
+        startActivity(intent);
+
+    }   // clickSaveMain
 
     public void clickNonFix(View view) {
 
@@ -156,7 +184,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         }   //for
 
         //Show Area
-        String strArea = String.format("%.4f", Area) + " Sq.km";
+        strArea = String.format("%.4f", Area) + " Sq.km";
         areaTextView.setText(strArea);
 
 
