@@ -377,6 +377,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         setOnMarkerForDelete();
 
 
+
     }   // onMapReady
 
     private void setOnMarkerForDelete() {
